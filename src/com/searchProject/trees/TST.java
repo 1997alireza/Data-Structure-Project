@@ -16,6 +16,7 @@ public class TST implements Tree {
         boolean isEnd;
         Node left, middle, right;
         LinkedList<String> fileList;
+        int balanceFactor; // right height - left height
 
         public Node(char data) {
             this.data = data;
@@ -25,6 +26,7 @@ public class TST implements Tree {
             this.middle = null;
             this.right = null;
             fileList = new LinkedList<>();
+            balanceFactor = 0;
         }
 
         @Override
@@ -47,11 +49,7 @@ public class TST implements Tree {
         return isEmpty(root);
     }
     private boolean isEmpty(Node r){
-        if(r == null)
-            return true;
-        if(r.isEnd)
-            return false;
-        return isEmpty(r.left) & isEmpty(r.middle) & isEmpty(r.right);
+        return r == null || !r.isEnd && isEmpty(r.left) && isEmpty(r.middle) && isEmpty(r.right);
     }
     public void makeEmpty() {
         root = null;
@@ -59,6 +57,7 @@ public class TST implements Tree {
     public Node insert(String word) {
         NodePointer finalNodePtr = new NodePointer();
         root = insert(root, word.toCharArray(), 0, finalNodePtr);
+        balance();
         return finalNodePtr.node;
     }
     private Node insert(Node r, char[] word, int ptr, final NodePointer finalNodePtr) {
@@ -83,6 +82,7 @@ public class TST implements Tree {
 
     public void delete(String word) {
         delete(root, word.toCharArray(), 0);
+        balance();
     }
     private void delete(Node r, char[] word, int ptr) {
         if (r == null)
@@ -198,10 +198,7 @@ public class TST implements Tree {
 
         }
 
-        if(r.left == null && r.middle == null && r.right == null && !r.isEnd)
-            return true;
-
-        return false;
+        return r.left == null && r.middle == null && r.right == null && !r.isEnd;
 
     }
 
@@ -218,12 +215,7 @@ public class TST implements Tree {
         else if (word[ptr] > r.data)
             return search(r.right, word, ptr);
         else {
-            if (r.isEnd && ptr == word.length - 1)
-                return true;
-            else if (ptr == word.length - 1)
-                return false;
-            else
-                return search(r.middle, word, ptr + 1);
+            return r.isEnd && ptr == word.length - 1 || ptr != word.length - 1 && search(r.middle, word, ptr + 1);
         }
     }
 
@@ -289,6 +281,180 @@ public class TST implements Tree {
         getNodes(r.left, list);
         getNodes(r.middle, list);
         getNodes(r.right, list);
+    }
+
+    @Override
+    public int getHeight() {
+        return getHeight(root);
+    }
+
+    private int getHeight(Node r){
+        if(r == null)
+            return 0;
+
+        return Tools.max(getHeight(r.left), getHeight(r.middle), getHeight(r.right)) + 1;
+    }
+
+    private void balance(){
+        balance(root, null, 0);
+    }
+
+    private int getHeightWithoutMiddleChild(Node r){
+        if(r == null)
+            return 0;
+
+        return Tools.max(getHeightWithoutMiddleChild(r.left), getHeightWithoutMiddleChild(r.right)) + 1;
+    }
+
+    /**
+     *
+     * @param r
+     * @return int This return height of the tree
+     */
+    private int balance(Node r, Node p, int direction){ // direction: -1 0 1 : left middle right
+        if(r == null)
+            return 0;
+        int leftHeight = balance(r.left, r, -1);
+        int rightHeight = balance(r.right, r, 1);
+        balance(r.middle, r, 0);
+        r.balanceFactor = rightHeight - leftHeight;
+
+        int subTreeHeight = Tools.max(leftHeight, rightHeight) + 1;
+
+        if(r.balanceFactor == +2){
+            if(r.right.balanceFactor == +1){ //RR
+                Node b = r.right;
+
+                int AlHeight = getHeightWithoutMiddleChild(r.left); // a == r
+                int BrHeight = getHeightWithoutMiddleChild(b.right);
+                int BlHeight = getHeightWithoutMiddleChild(b.left);
+
+
+                if(p == null)
+                    root = b;
+                else {
+                    if (direction == -1)
+                        p.left = b;
+                    else if(direction == 1)
+                        p.right = b;
+                    else
+                        p.middle = b;
+                }
+
+                r.right = b.left;
+                b.left = r;
+
+                r.balanceFactor =  BlHeight - AlHeight;
+                int AHeight = Tools.max(AlHeight, BlHeight) + 1;
+                b.balanceFactor = BrHeight - AHeight;
+
+                subTreeHeight = Tools.max(AHeight, BrHeight) + 1;
+            }
+            else{ //RL
+                Node b = r.right;
+                Node c = b.left;
+
+                int AlHeight = getHeightWithoutMiddleChild(r.left);
+                int ClHeight = getHeightWithoutMiddleChild(c.left);
+                int CrHeight = getHeightWithoutMiddleChild(c.right);
+                int BrHeight = getHeightWithoutMiddleChild(b.right);
+                int AHeight = Tools.max(AlHeight, ClHeight) + 1;
+                int BHeight = Tools.max(CrHeight, BrHeight) + 1;
+
+
+                if(p == null)
+                    root = c;
+                else {
+                    if (direction == -1)
+                        p.left = c;
+                    else if(direction == 1)
+                        p.right = c;
+                    else
+                        p.middle = c;
+                }
+
+                r.right = c.left;
+                b.left = c.right;
+                c.left = r;
+                c.right = b;
+
+                b.balanceFactor = BrHeight - CrHeight;
+                r.balanceFactor = ClHeight - AlHeight;
+                c.balanceFactor = BHeight - AHeight;
+
+                subTreeHeight = Tools.max(AHeight, BHeight) + 1;
+            }
+        }
+        else if(r.balanceFactor == -2){
+            if(r.left.balanceFactor == -1){ //LL
+                Node b = r.left;
+
+                int ArHeight = getHeightWithoutMiddleChild(r.right); // a == r
+                int BrHeight = getHeightWithoutMiddleChild(b.right);
+                int BlHeight = getHeightWithoutMiddleChild(b.left);
+
+
+                if(p == null)
+                    root = b;
+                else {
+                    if (direction == -1)
+                        p.left = b;
+                    else if(direction == 1)
+                        p.right = b;
+                    else
+                        p.middle = b;
+                }
+
+                r.left = b.right;
+                b.right = r;
+
+                r.balanceFactor =  ArHeight - BrHeight;
+                int AHeight = Tools.max(ArHeight, BrHeight) + 1;
+                b.balanceFactor = AHeight - BlHeight;
+
+                subTreeHeight = Tools.max(AHeight, BlHeight) + 1;
+
+
+            }
+            else{ //LR
+                Node b = r.left;
+                Node c = b.right;
+
+                int ArHeight = getHeightWithoutMiddleChild(r.right);
+                int ClHeight = getHeightWithoutMiddleChild(c.left);
+                int CrHeight = getHeightWithoutMiddleChild(c.right);
+                int BlHeight = getHeightWithoutMiddleChild(b.left);
+                int AHeight = Tools.max(ArHeight, CrHeight) + 1;
+                int BHeight = Tools.max(ClHeight, BlHeight) + 1;
+
+
+                if(p == null)
+                    root = c;
+                else {
+                    if (direction == -1)
+                        p.left = c;
+                    else if(direction == 1)
+                        p.right = c;
+                    else
+                        p.middle = c;
+                }
+
+                r.left = c.right;
+                b.right = c.left;
+                c.right = r;
+                c.left = b;
+
+
+                b.balanceFactor = ClHeight - BlHeight;
+                r.balanceFactor = ArHeight - CrHeight;
+                c.balanceFactor = AHeight - BHeight;
+
+                subTreeHeight = Tools.max(AHeight, BHeight) + 1;
+            }
+        }
+
+        return subTreeHeight;
+
     }
 
 }

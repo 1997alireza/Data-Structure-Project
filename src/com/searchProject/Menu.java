@@ -166,20 +166,23 @@ public class Menu extends JFrame{
                 Menu.directoryAddress = directory.getPath();
 
                 if(BSTButton.isSelected()) {
-                    wordsTree = build(directory, TREE.BST, false);
                     treeType = TREE.BST;
                 }
                 else if(TSTButton.isSelected()) {
-                    wordsTree = build(directory, TREE.TST, false);
                     treeType = TREE.TST;
                 }
                 else if(TrieButton.isSelected()) {
-                    wordsTree = build(directory, TREE.Trie, false);
                     treeType = TREE.Trie;
                 }
 
+                long cTime = System.nanoTime();
+                wordsTree = build(directory, treeType, false);
+                System.out.printf("time : " + String.valueOf(System.nanoTime() - cTime) + "\n");
+                System.out.printf("height : " + wordsTree.getHeight() + "\n") ;
+
                 showWordsList();
 
+                buildButton.setEnabled(false);
                 browseButton.setEnabled(false);
                 directoryTextField.setEnabled(false);
                 BSTButton.setEnabled(false);
@@ -198,6 +201,7 @@ public class Menu extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 browseButton.setEnabled(true);
+                buildButton.setEnabled(true);
                 directoryTextField.setEnabled(true);
                 BSTButton.setEnabled(true);
                 TSTButton.setEnabled(true);
@@ -268,9 +272,8 @@ public class Menu extends JFrame{
         if(!isAStopWordsTree)
             listOfFiles = directory.listFiles();
 
-        for (int i = 0; i < listOfFiles.length; i++) {
-            addFile(listOfFiles[i], tree, type, isAStopWordsTree);
-        }
+        for(File file : listOfFiles)
+            addFile(file, tree, type, isAStopWordsTree);
 
         return tree;
     }

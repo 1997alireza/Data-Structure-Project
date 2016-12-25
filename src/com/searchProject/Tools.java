@@ -1,8 +1,5 @@
 package com.searchProject;
 
-/**
- * Created by AliReza on 16/12/2016.
- */
 public class Tools {
     public static boolean isBigger(String s1, String s2){
         char [] c1 = s1.toCharArray(), c2 = s2.toCharArray();
@@ -13,9 +10,15 @@ public class Tools {
                 return true;
         }
 
-        if(c1.length < c2.length)
-            return false;
+        return c1.length >= c2.length;
+    }
 
-        return true;
+    public static int max (int ... a){
+        if(a == null || a.length == 0)
+            return 0;
+        int max = a[0];
+        for(int i = 1; i < a.length; i++)
+            max = (a[i] > max) ? a[i] : max;
+        return max;
     }
 }

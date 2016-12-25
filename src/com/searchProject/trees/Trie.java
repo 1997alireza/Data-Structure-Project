@@ -1,6 +1,7 @@
 package com.searchProject.trees;
 
 import com.searchProject.ResultNode;
+import com.searchProject.Tools;
 import com.searchProject.dataStructures.Set;
 import com.searchProject.dataStructures.LinkedList;
 
@@ -87,10 +88,7 @@ public class Trie implements Tree {
         if(r == null)
             return true;
         if(word.length == ptr) {
-            if(r.childs.size() == 0)
-                return true;
-            else
-                return false;
+            return r.childs.size() == 0;
         }
         else {
             if (delete(r.childs.get(word[ptr]), word, ptr + 1)) {
@@ -167,6 +165,24 @@ public class Trie implements Tree {
         for(Node child : r.childs){
             getNodes(child, list);
         }
+    }
+
+    @Override
+    public int getHeight() {
+        return getHeight(root);
+    }
+
+    private int getHeight(Node r){
+        if(r == null)
+            return 0;
+        if(r.childs.size() == 0)
+            return 1;
+        int maxHeightOfChilds = getHeight(r.childs.get(0));
+        for(int i = 1; i < r.childs.size(); i++) {
+            int childHeight = getHeight(r.childs.get(i));
+            maxHeightOfChilds = (childHeight > maxHeightOfChilds) ? childHeight : maxHeightOfChilds;
+        }
+        return maxHeightOfChilds + 1;
     }
 }
 

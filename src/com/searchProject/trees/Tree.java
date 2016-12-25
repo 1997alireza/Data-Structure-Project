@@ -19,4 +19,5 @@ public interface Tree {
     Node get(String word);
     ArrayList<ResultNode> getResult();
     ArrayList<Node> getNodes();
+    int getHeight();
 }
