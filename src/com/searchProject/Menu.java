@@ -1,11 +1,10 @@
 package com.searchProject;
 
-import com.searchProject.dataStructures.Stack;
-import com.searchProject.trees.BST;
-import com.searchProject.trees.TST;
-import com.searchProject.trees.Tree;
-import com.searchProject.trees.Trie;
-import com.searchProject.dataStructures.LinkedList;
+import com.searchProject.dataStructures.*;
+import com.searchProject.dataStructures.trees.BST;
+import com.searchProject.dataStructures.trees.TST;
+import com.searchProject.dataStructures.trees.Tree;
+import com.searchProject.dataStructures.trees.Trie;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,14 +20,14 @@ import java.util.Scanner;
 
 public class Menu extends JFrame{
     private static ArrayList<String> inAppFileList;
-    private static TREE treeType;
-    private static Tree []stopWordsTrees;
-    private static Tree wordsTree;
+    private static DATA_STRUCTURE_TYPE dataStructureType;
+    private static DataStructure [] stopWordsStructures;
+    private static DataStructure wordsStructure;
     private static String directoryAddress = "";
     private static Stack<String> backwardCommands, forwardCommands;
     private static JTextArea resultField;
-    public enum TREE{
-        BST, TST, Trie
+    public enum DATA_STRUCTURE_TYPE {
+        BST, TST, Trie, CustomHashMap
     }
     public Menu(){
         setSize(640,600);
@@ -41,24 +40,30 @@ public class Menu extends JFrame{
         final JRadioButton TSTButton = new JRadioButton("TST");
         final JRadioButton BSTButton = new JRadioButton("BST");
         final JRadioButton TrieButton = new JRadioButton("Trie");
+        final JRadioButton customHashMapButton = new JRadioButton("HashMap");
 
-        TSTButton.setLocation(400,430);
-        TSTButton.setSize(60,25);
+        TSTButton.setLocation(60,430);
+        TSTButton.setSize(80,25);
 
-        BSTButton.setLocation(480,430);
-        BSTButton.setSize(60,25);
+        BSTButton.setLocation(210,430);
+        BSTButton.setSize(80,25);
 
-        TrieButton.setLocation(560,430);
-        TrieButton.setSize(60,25);
+        TrieButton.setLocation(360,430);
+        TrieButton.setSize(80,25);
 
-        final ButtonGroup treeSelector = new ButtonGroup();
-        treeSelector.add(TSTButton);
-        treeSelector.add(BSTButton);
-        treeSelector.add(TrieButton);
+        customHashMapButton.setLocation(510,430);
+        customHashMapButton.setSize(80, 25);
+
+        final ButtonGroup dataStructureSelector = new ButtonGroup();
+        dataStructureSelector.add(TSTButton);
+        dataStructureSelector.add(BSTButton);
+        dataStructureSelector.add(TrieButton);
+        dataStructureSelector.add(customHashMapButton);
 
         getContentPane().add(TSTButton);
         getContentPane().add(BSTButton);
         getContentPane().add(TrieButton);
+        getContentPane().add(customHashMapButton);
 
         final JLabel text1 = new JLabel("Please enter address.");
         text1.setFont(new Font("Monospaced", text1.getFont().getStyle(), 17));
@@ -103,15 +108,15 @@ public class Menu extends JFrame{
         getContentPane().add(SP);
 
         final JLabel text2 = new JLabel("Please enter your command :");
-        text2.setFont(new Font("Monospaced", text2.getFont().getStyle(), 17));
-        text2.setLocation(10,435);
+        text2.setFont(new Font("Monospaced", text2.getFont().getStyle(), 14));
+        text2.setLocation(10,465);
         text2.setSize(300,15);
         getContentPane().add(text2);
 
         final JTextField commandTextField = new JTextField();
         commandTextField.setFont(new Font("Monospaced", text1.getFont().getStyle(), 13));
         commandTextField.setSize(611,25);
-        commandTextField.setLocation(10, 455);
+        commandTextField.setLocation(10, 485);
         commandTextField.setEnabled(false);
         commandTextField.addKeyListener(new KeyAdapter() {
             @Override
@@ -148,37 +153,49 @@ public class Menu extends JFrame{
 
         final JButton buildButton = new JButton("Build");
         buildButton.setSize(100, 25);
-        buildButton.setLocation(10, 485);
+        buildButton.setLocation(10, 515);
         buildButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(treeSelector.getSelection() == null) {
+                if(dataStructureSelector.getSelection() == null) {
+                    resultField.setText("Error : Select a data structure");
                     return;
                 }
                 String directoryAddress = directoryTextField.getText();
                 if(directoryAddress.equals("")) {
+                    resultField.setText("Error : Choose a directory");
                     return;
                 }
                 File directory = new File(directoryAddress);
-                if(!directory.exists() || directory.isFile())
+                if(!directory.exists()) {
+                    resultField.setText("Error : Chosen directory is not exist");
                     return;
+                }
+                if(directory.isFile()){
+                    resultField.setText("Error : Please choose a directory");
+                    return;
+                }
 
                 Menu.directoryAddress = directory.getPath();
 
                 if(BSTButton.isSelected()) {
-                    treeType = TREE.BST;
+                    dataStructureType = DATA_STRUCTURE_TYPE.BST;
                 }
                 else if(TSTButton.isSelected()) {
-                    treeType = TREE.TST;
+                    dataStructureType = DATA_STRUCTURE_TYPE.TST;
                 }
                 else if(TrieButton.isSelected()) {
-                    treeType = TREE.Trie;
+                    dataStructureType = DATA_STRUCTURE_TYPE.Trie;
+                }
+                else if(customHashMapButton.isSelected()) {
+                    dataStructureType = DATA_STRUCTURE_TYPE.CustomHashMap;
                 }
 
                 long cTime = System.nanoTime();
-                wordsTree = build(directory, treeType, false);
+                wordsStructure = build(directory, dataStructureType, false);
                 System.out.printf("time : " + String.valueOf(System.nanoTime() - cTime) + "\n");
-                System.out.printf("height : " + wordsTree.getHeight() + "\n") ;
+                if(wordsStructure instanceof Tree)
+                    System.out.printf("height : " + ((Tree)wordsStructure).getHeight() + "\n") ;
 
                 showWordsList();
 
@@ -188,6 +205,7 @@ public class Menu extends JFrame{
                 BSTButton.setEnabled(false);
                 TSTButton.setEnabled(false);
                 TrieButton.setEnabled(false);
+                customHashMapButton.setEnabled(false);
                 commandTextField.setEnabled(true);
 
             }
@@ -196,16 +214,21 @@ public class Menu extends JFrame{
 
         final JButton resetButton = new JButton("Reset");
         resetButton.setSize(100, 25);
-        resetButton.setLocation(180, 485);
+        resetButton.setLocation(180, 515);
         resetButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                if(wordsStructure != null)
+                    wordsStructure.makeEmpty();
+                wordsStructure = null;
+                System.gc();
                 browseButton.setEnabled(true);
                 buildButton.setEnabled(true);
                 directoryTextField.setEnabled(true);
                 BSTButton.setEnabled(true);
                 TSTButton.setEnabled(true);
                 TrieButton.setEnabled(true);
+                customHashMapButton.setEnabled(true);
                 resultField.setText("");
                 commandTextField.setText("");
                 commandTextField.setEnabled(false);
@@ -217,7 +240,7 @@ public class Menu extends JFrame{
 
         final JButton helpButton = new JButton("Help");
         helpButton.setSize(100, 25);
-        helpButton.setLocation(350, 485);
+        helpButton.setLocation(350, 515);
         helpButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -228,7 +251,7 @@ public class Menu extends JFrame{
 
         final JButton exitButton = new JButton("Exit");
         exitButton.setSize(100, 25);
-        exitButton.setLocation(520, 485);
+        exitButton.setLocation(520, 515);
         exitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -246,39 +269,43 @@ public class Menu extends JFrame{
         setVisible(true);
         buildButton.setEnabled(false);
         final String stopWordsAddress = "src/res/StopWords.txt";
-        stopWordsTrees = new Tree[3];
-        stopWordsTrees[TREE.BST.ordinal()] = build(new File(stopWordsAddress), TREE.BST, true);
-        stopWordsTrees[TREE.TST.ordinal()] = build(new File(stopWordsAddress), TREE.TST, true);
-        stopWordsTrees[TREE.Trie.ordinal()] = build(new File(stopWordsAddress), TREE.Trie, true);
+        stopWordsStructures = new DataStructure[4];
+        stopWordsStructures[DATA_STRUCTURE_TYPE.BST.ordinal()] = build(new File(stopWordsAddress), DATA_STRUCTURE_TYPE.BST, true);
+        stopWordsStructures[DATA_STRUCTURE_TYPE.TST.ordinal()] = build(new File(stopWordsAddress), DATA_STRUCTURE_TYPE.TST, true);
+        stopWordsStructures[DATA_STRUCTURE_TYPE.Trie.ordinal()] = build(new File(stopWordsAddress), DATA_STRUCTURE_TYPE.Trie, true);
+        stopWordsStructures[DATA_STRUCTURE_TYPE.CustomHashMap.ordinal()] = build(new File(stopWordsAddress), DATA_STRUCTURE_TYPE.CustomHashMap, true);
         buildButton.setEnabled(true);
 
     }
 
-    private Tree build(File directory, TREE type, boolean isAStopWordsTree){
-        Tree tree = null;
+    private DataStructure build(File directory, DATA_STRUCTURE_TYPE type, boolean isAStopWordsStructure){
+        DataStructure dataStructure = null;
         switch (type){
             case BST:
-                tree = new BST();
+                dataStructure = new BST();
                 break;
             case TST:
-                tree = new TST();
+                dataStructure = new TST();
                 break;
             case Trie:
-                tree = new Trie();
+                dataStructure = new Trie();
+                break;
+            case CustomHashMap:
+                dataStructure = new CustomHashMap();
                 break;
         }
 
         File[] listOfFiles = {directory};
-        if(!isAStopWordsTree)
+        if(!isAStopWordsStructure)
             listOfFiles = directory.listFiles();
 
         for(File file : listOfFiles)
-            addFile(file, tree, type, isAStopWordsTree);
+            addFile(file, dataStructure, type, isAStopWordsStructure);
 
-        return tree;
+        return dataStructure;
     }
 
-    private int addFile(File file, Tree tree, TREE type, boolean isAStopWordsTree){
+    private int addFile(File file, DataStructure dataStructure, DATA_STRUCTURE_TYPE type, boolean isAStopWordsStructure){
         if (file == null) return 0;
         if(!file.exists() || !file.isFile()) return -1;
         int iOfExtension = file.getName().lastIndexOf('.');
@@ -286,20 +313,20 @@ public class Menu extends JFrame{
             return -1;
 
         String fileName = file.getName().substring(0, iOfExtension);
-        if(!isAStopWordsTree && inAppFileList.contains(fileName))
+        if(!isAStopWordsStructure && inAppFileList.contains(fileName))
             return -2;
 
         try {
-            if(!isAStopWordsTree/* && !inAppFileList.contains(fileName)*/)
+            if(!isAStopWordsStructure/* && !inAppFileList.contains(fileName)*/)
                 inAppFileList.add(fileName);
             Scanner scanner = new Scanner(file);
             while(scanner.hasNext()) {
                 String s = scanner.next();
                 String[] words = s.toLowerCase().split("\\W+");
                 for (String word : words) {
-                    if (word.length() != 0 && (isAStopWordsTree || !stopWordsTrees[type.ordinal()].search(word))) {
-                        Tree.Node node = tree.insert(word);
-                        LinkedList <String> fileList = node.getFileList();
+                    if (word.length() != 0 && (isAStopWordsStructure || !stopWordsStructures[type.ordinal()].search(word))) {
+                        DataStructure.Member member = dataStructure.insert(word);
+                        LinkedList <String> fileList = member.getFileList();
                         if(!fileList.contains(fileName))
                             fileList.add(fileName);
                     }
@@ -313,16 +340,16 @@ public class Menu extends JFrame{
         return 1;
     }
 
-    private int deleteFile(String fileName, Tree tree){
+    private int deleteFile(String fileName, DataStructure dataStructure){
         if(!inAppFileList.contains(fileName))
             return -1;
         inAppFileList.remove(fileName);
-        for(Tree.Node node : tree.getNodes())
+        for(DataStructure.Member node : dataStructure.getMembers())
             for(int i=0; i<node.getFileList().size(); i++){
                 if(node.getFileList().get(i).equals(fileName)){
                     node.getFileList().remove(i);
                     if(node.getFileList().size() == 0)
-                        tree.delete(node.getWord());
+                        dataStructure.delete(node.getWord());
                     break;
                 }
             }
@@ -332,8 +359,8 @@ public class Menu extends JFrame{
     private void showWordsList(){
         resultField.setText("");
         resultField.append("\n");
-        ArrayList<ResultNode> result = wordsTree.getResult();
-        for(ResultNode rNode : result){
+        ArrayList<ResultEntry> result = wordsStructure.getResult();
+        for(ResultEntry rNode : result){
             resultField.append("|" + rNode.word + " -> ");
             for(int i=0; i < rNode.fileList.size()-1 ; i++) {
                 resultField.append(rNode.fileList.get(i) + ", ");
@@ -371,10 +398,12 @@ public class Menu extends JFrame{
     }
 
     private LinkedList<String> search(String word){
-        Tree.Node node = wordsTree.get(word);
-        if(node == null)
+        long startTime = System.nanoTime();
+        DataStructure.Member member = wordsStructure.get(word);
+        System.out.println("Search time : " + (System.nanoTime() - startTime) + "\n");
+        if(member == null)
             return null;
-        return node.getFileList();
+        return member.getFileList();
     }
     private boolean showSearchWordResult(String word){
         resultField.setText("");
@@ -396,7 +425,7 @@ public class Menu extends JFrame{
         String[] words = exp.split("\\W+");
         ArrayList<LinkedList<String>> filesLists = new ArrayList<>();
         for(String word : words){
-            if(!stopWordsTrees[treeType.ordinal()].search(word)){
+            if(!stopWordsStructures[dataStructureType.ordinal()].search(word)){
                 filesLists.add(search(word));
             }
         }
@@ -456,7 +485,7 @@ public class Menu extends JFrame{
             case "exit":
                 System.exit(0);
             case "add":
-                int addResult = addFile(new File(directoryAddress+"\\"+param+".txt"), wordsTree, treeType, false);
+                int addResult = addFile(new File(directoryAddress+"\\"+param+".txt"), wordsStructure, dataStructureType, false);
                 switch (addResult){
                     case -1:
                         resultField.setText("");
@@ -472,7 +501,7 @@ public class Menu extends JFrame{
                 }
                 break;
             case "del":
-                int delResult = deleteFile(param, wordsTree);
+                int delResult = deleteFile(param, wordsStructure);
                 switch (delResult){
                     case -1:
                         resultField.setText("");
@@ -487,9 +516,9 @@ public class Menu extends JFrame{
                 }
                 break;
             case "update":
-                if(deleteFile(param, wordsTree) == -1)
+                if(deleteFile(param, wordsStructure) == -1)
                     break;
-                int addRes = addFile(new File(directoryAddress+"\\"+param+".txt"), wordsTree, treeType, false);
+                int addRes = addFile(new File(directoryAddress+"\\"+param+".txt"), wordsStructure, dataStructureType, false);
                 switch (addRes){
                     case -1:
                         resultField.setText("");

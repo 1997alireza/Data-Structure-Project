@@ -1,16 +1,16 @@
-package com.searchProject.trees;
+package com.searchProject.dataStructures.trees;
 
-import com.searchProject.ResultNode;
+import com.searchProject.dataStructures.ResultEntry;
 import com.searchProject.Tools;
 import com.searchProject.dataStructures.LinkedList;
 
 import java.util.ArrayList;
 
-public class BST implements Tree {
+public class BST extends Tree {
     private static class NodePointer{
         public Node node;
     }
-    public static class Node implements Tree.Node{
+    public static class Node extends Tree.Node{
         String data;
         Node left,right;
         LinkedList<String> fileList;
@@ -168,17 +168,17 @@ public class BST implements Tree {
     }
 
     @Override
-    public ArrayList<ResultNode> getResult() {
-        ArrayList<ResultNode> result = new ArrayList<>();
+    public ArrayList<ResultEntry> getResult() {
+        ArrayList<ResultEntry> result = new ArrayList<>();
         getResult(root, result);
         return result;
     }
 
-    private void getResult(Node r, ArrayList<ResultNode> result){
+    private void getResult(Node r, ArrayList<ResultEntry> result){
         if(r == null)
             return;
 //        if(r.getFileList().size() != 0) {
-            ResultNode rNode = new ResultNode();
+            ResultEntry rNode = new ResultEntry();
             rNode.word = r.data;
             for (String fileName : r.getFileList()) {
                 rNode.fileList.add(fileName);
@@ -191,13 +191,13 @@ public class BST implements Tree {
     }
 
     @Override
-    public ArrayList<Tree.Node> getNodes() {
-        ArrayList<Tree.Node> list = new ArrayList<>();
+    public ArrayList<Member> getMembers() {
+        ArrayList<Member> list = new ArrayList<>();
         getNodes(root, list);
         return list;
     }
 
-    private void getNodes(Node r, ArrayList<Tree.Node> list){
+    private void getNodes(Node r, ArrayList<Member> list){
         if(r == null)
             return;
         if(r.getFileList().size() != 0)

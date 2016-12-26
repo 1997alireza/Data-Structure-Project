@@ -1,15 +1,14 @@
-package com.searchProject.trees;
+package com.searchProject.dataStructures.trees;
 
-import com.searchProject.ResultNode;
-import com.searchProject.Tools;
+import com.searchProject.dataStructures.ResultEntry;
 import com.searchProject.dataStructures.Set;
 import com.searchProject.dataStructures.LinkedList;
 
 import java.util.ArrayList;
 
 
-public class Trie implements Tree {
-    public static class Node implements Tree.Node{
+public class Trie extends Tree {
+    public static class Node extends Tree.Node{
         char data;
         String word;
         boolean isEnd;
@@ -130,15 +129,15 @@ public class Trie implements Tree {
     }
 
     @Override
-    public ArrayList<ResultNode> getResult() {
-        ArrayList<ResultNode> result = new ArrayList<>();
+    public ArrayList<ResultEntry> getResult() {
+        ArrayList<ResultEntry> result = new ArrayList<>();
         getResult(root, "", result);
         return result;
     }
-    private void getResult(Node r, String word, ArrayList<ResultNode> result){
+    private void getResult(Node r, String word, ArrayList<ResultEntry> result){
         word += r.data;
         if(r.isEnd/* &&  r.getFileList().size() != 0*/){
-            ResultNode rNode = new ResultNode();
+            ResultEntry rNode = new ResultEntry();
             rNode.word = word;
             for(String fileName : r.getFileList()){
                 rNode.fileList.add(fileName);
@@ -151,13 +150,13 @@ public class Trie implements Tree {
     }
 
     @Override
-    public ArrayList<Tree.Node> getNodes() {
-        ArrayList<Tree.Node> list = new ArrayList<>();
+    public ArrayList<Member> getMembers() {
+        ArrayList<Member> list = new ArrayList<>();
         getNodes(root, list);
         return list;
     }
 
-    private void getNodes(Node r, ArrayList<Tree.Node> list){
+    private void getNodes(Node r, ArrayList<Member> list){
         if(r.isEnd &&  r.getFileList().size() != 0){
             list.add(r);
         }

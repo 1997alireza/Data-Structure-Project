@@ -52,6 +52,10 @@ public class LinkedList<E> implements Iterable<E>{
         return r.data;
     }
 
+    public E getLast(){
+        return last.data;
+    }
+
     public E remove(int index){
         if(index >= size || size == 0)
             return null;
