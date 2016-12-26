@@ -530,6 +530,8 @@ public class Menu extends JFrame{
                 }
                 break;
             case "list":
+                if(commandType.toCharArray()[0] != '-')
+                    resultField.setText("Error : command \"" + commandName + "\" requires an argument");
                 switch (commandType){
                     case "-w":
                         showWordsList();
@@ -540,13 +542,19 @@ public class Menu extends JFrame{
                     case "-f":
                         showFilesListedInDir();
                         break;
+                    default:
+                        resultField.setText("Error : command \"" + commandName + "\" hasn't an argument \'" + commandType + "\'");
                 }
                 break;
             case "search":
                 String mainParam = param;
                 param = param.toLowerCase();
-                if(param.length() < 2 || param.charAt(0) != '"' || param.charAt(param.length()-1) != '"')
+                if(param.length() < 2 || param.charAt(0) != '"' || param.charAt(param.length()-1) != '"') {
+                    resultField.setText("Error : command \"" + commandName + "\" requires a parameter between \" \"");
                     break;
+                }
+                if(commandType.toCharArray()[0] != '-')
+                    resultField.setText("Error : command \"" + commandName + "\" requires an argument");
                 switch (commandType){
                     case "-w":
                         boolean isFindWord = showSearchWordResult(param.substring(1, param.length()-1));
@@ -564,8 +572,15 @@ public class Menu extends JFrame{
                         }
 
                         break;
+                    default:
+                        resultField.setText("Error : command \"" + commandName + "\" hasn't an argument \'" + commandType.substring(1) + "\'");
+
                 }
                 break;
+
+            default:
+                resultField.setText("Error : command \""+ commandName +"\" not found");
+
         }
 
     }
