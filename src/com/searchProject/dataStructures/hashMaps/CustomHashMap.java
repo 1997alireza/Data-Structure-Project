@@ -1,14 +1,18 @@
-package com.searchProject.dataStructures;
+package com.searchProject.dataStructures.hashMaps;
+
+import com.searchProject.dataStructures.DataStructure;
+import com.searchProject.dataStructures.LinkedList;
+import com.searchProject.dataStructures.ResultEntry;
 
 import java.util.ArrayList;
 
 /**
  * Its a HashMap with String keys
  */
-public class CustomHashMap implements DataStructure{
+public class CustomHashMap implements DataStructure {
 
     private LinkedList<Entry>[] hashTable;
-    private static final int HASH_TABLE_SIZE = 113;
+    private static final int HASH_TABLE_SIZE = 1024;
 
     public static class Entry implements Member {
         String key;

@@ -138,7 +138,7 @@ public class Trie extends Tree {
         word += r.data;
         if(r.isEnd/* &&  r.getFileList().size() != 0*/){
             ResultEntry rNode = new ResultEntry();
-            rNode.word = word;
+            rNode.word = word.substring(1); // because of existing space in the root
             for(String fileName : r.getFileList()){
                 rNode.fileList.add(fileName);
             }

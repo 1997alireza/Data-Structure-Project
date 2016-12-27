@@ -1,6 +1,8 @@
 package com.searchProject;
 
 import com.searchProject.dataStructures.*;
+import com.searchProject.dataStructures.hashMaps.CustomHashMap;
+import com.searchProject.dataStructures.hashMaps.JavaHashMap;
 import com.searchProject.dataStructures.trees.BST;
 import com.searchProject.dataStructures.trees.TST;
 import com.searchProject.dataStructures.trees.Tree;
@@ -27,7 +29,7 @@ public class Menu extends JFrame{
     private static Stack<String> backwardCommands, forwardCommands;
     private static JTextArea resultField;
     public enum DATA_STRUCTURE_TYPE {
-        BST, TST, Trie, CustomHashMap
+        BST, TST, Trie, CustomHashMap, JavaHashMap
     }
     public Menu(){
         setSize(640,600);
@@ -41,29 +43,36 @@ public class Menu extends JFrame{
         final JRadioButton BSTButton = new JRadioButton("BST");
         final JRadioButton TrieButton = new JRadioButton("Trie");
         final JRadioButton customHashMapButton = new JRadioButton("HashMap");
+        final JRadioButton javaHashMapButton = new JRadioButton("Java HashMap");
 
-        TSTButton.setLocation(60,430);
+
+        TSTButton.setLocation(30,430);
         TSTButton.setSize(80,25);
 
-        BSTButton.setLocation(210,430);
+        BSTButton.setLocation(120,430);
         BSTButton.setSize(80,25);
 
-        TrieButton.setLocation(360,430);
+        TrieButton.setLocation(210,430);
         TrieButton.setSize(80,25);
 
-        customHashMapButton.setLocation(510,430);
+        customHashMapButton.setLocation(380,430);
         customHashMapButton.setSize(80, 25);
+
+        javaHashMapButton.setLocation(490, 430);
+        javaHashMapButton.setSize(120, 25);
 
         final ButtonGroup dataStructureSelector = new ButtonGroup();
         dataStructureSelector.add(TSTButton);
         dataStructureSelector.add(BSTButton);
         dataStructureSelector.add(TrieButton);
         dataStructureSelector.add(customHashMapButton);
+        dataStructureSelector.add(javaHashMapButton);
 
         getContentPane().add(TSTButton);
         getContentPane().add(BSTButton);
         getContentPane().add(TrieButton);
         getContentPane().add(customHashMapButton);
+        getContentPane().add(javaHashMapButton);
 
         final JLabel text1 = new JLabel("Please enter address.");
         text1.setFont(new Font("Monospaced", text1.getFont().getStyle(), 17));
@@ -190,12 +199,20 @@ public class Menu extends JFrame{
                 else if(customHashMapButton.isSelected()) {
                     dataStructureType = DATA_STRUCTURE_TYPE.CustomHashMap;
                 }
+                else if(javaHashMapButton.isSelected()) {
+                    dataStructureType = DATA_STRUCTURE_TYPE.JavaHashMap;
+                }
 
                 long cTime = System.nanoTime();
                 wordsStructure = build(directory, dataStructureType, false);
-                System.out.printf("time : " + String.valueOf(System.nanoTime() - cTime) + "\n");
+                System.out.printf("Build Time : " + String.valueOf(System.nanoTime() - cTime) + "\n");
                 if(wordsStructure instanceof Tree)
-                    System.out.printf("height : " + ((Tree)wordsStructure).getHeight() + "\n") ;
+                    System.out.printf("Height of The Tree : " + ((Tree)wordsStructure).getHeight() + "\n") ;
+                try {
+                    testSearchTime();
+                } catch (ResultEntry.ResultException e1) {
+                    e1.printStackTrace();
+                }
 
                 showWordsList();
 
@@ -206,6 +223,7 @@ public class Menu extends JFrame{
                 TSTButton.setEnabled(false);
                 TrieButton.setEnabled(false);
                 customHashMapButton.setEnabled(false);
+                javaHashMapButton.setEnabled(false);
                 commandTextField.setEnabled(true);
 
             }
@@ -229,6 +247,7 @@ public class Menu extends JFrame{
                 TSTButton.setEnabled(true);
                 TrieButton.setEnabled(true);
                 customHashMapButton.setEnabled(true);
+                javaHashMapButton.setEnabled(true);
                 resultField.setText("");
                 commandTextField.setText("");
                 commandTextField.setEnabled(false);
@@ -269,11 +288,12 @@ public class Menu extends JFrame{
         setVisible(true);
         buildButton.setEnabled(false);
         final String stopWordsAddress = "src/res/StopWords.txt";
-        stopWordsStructures = new DataStructure[4];
+        stopWordsStructures = new DataStructure[5];
         stopWordsStructures[DATA_STRUCTURE_TYPE.BST.ordinal()] = build(new File(stopWordsAddress), DATA_STRUCTURE_TYPE.BST, true);
         stopWordsStructures[DATA_STRUCTURE_TYPE.TST.ordinal()] = build(new File(stopWordsAddress), DATA_STRUCTURE_TYPE.TST, true);
         stopWordsStructures[DATA_STRUCTURE_TYPE.Trie.ordinal()] = build(new File(stopWordsAddress), DATA_STRUCTURE_TYPE.Trie, true);
         stopWordsStructures[DATA_STRUCTURE_TYPE.CustomHashMap.ordinal()] = build(new File(stopWordsAddress), DATA_STRUCTURE_TYPE.CustomHashMap, true);
+        stopWordsStructures[DATA_STRUCTURE_TYPE.JavaHashMap.ordinal()] = build(new File(stopWordsAddress), DATA_STRUCTURE_TYPE.JavaHashMap, true);
         buildButton.setEnabled(true);
 
     }
@@ -292,6 +312,9 @@ public class Menu extends JFrame{
                 break;
             case CustomHashMap:
                 dataStructure = new CustomHashMap();
+                break;
+            case JavaHashMap:
+                dataStructure = new JavaHashMap();
                 break;
         }
 
@@ -398,9 +421,7 @@ public class Menu extends JFrame{
     }
 
     private LinkedList<String> search(String word){
-        long startTime = System.nanoTime();
         DataStructure.Member member = wordsStructure.get(word);
-        System.out.println("Search time : " + (System.nanoTime() - startTime) + "\n");
         if(member == null)
             return null;
         return member.getFileList();
@@ -582,6 +603,19 @@ public class Menu extends JFrame{
                 resultField.setText("Error : command \""+ commandName +"\" not found");
 
         }
+
+    }
+
+    private void testSearchTime() throws ResultEntry.ResultException {
+        ArrayList<ResultEntry> result = wordsStructure.getResult();
+
+        long startTime = System.nanoTime();
+        for(ResultEntry rEntry : result)
+            if (!wordsStructure.search(rEntry.word)) {
+                throw new ResultEntry.ResultException("The word should be in the structure");
+            }
+
+        System.out.println("Mean Search Time : " + ((System.nanoTime() - startTime) / result.size()) + " ---> For " + result.size() + " Words\n");
 
     }
 
