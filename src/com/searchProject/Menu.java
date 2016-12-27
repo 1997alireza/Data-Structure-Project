@@ -341,7 +341,7 @@ public class Menu extends JFrame{
 
         setVisible(true);
         buildButton.setEnabled(false);
-        final String stopWordsAddress = "src/res/StopWords.txt";
+        final String stopWordsAddress = "res/StopWords.txt";
         stopWordsStructures = new DataStructure[7];
         stopWordsStructures[DATA_STRUCTURE_TYPE.BST.ordinal()] = build(new File(stopWordsAddress), DATA_STRUCTURE_TYPE.BST, true);
         stopWordsStructures[DATA_STRUCTURE_TYPE.BalancedBST.ordinal()] = build(new File(stopWordsAddress), DATA_STRUCTURE_TYPE.BalancedBST, true);
