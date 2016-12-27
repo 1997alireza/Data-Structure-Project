@@ -267,7 +267,6 @@ public class Menu extends JFrame{
 
                 showWordsList();
 
-                balancedTreeCheckOption.setEnabled(false);
                 buildButton.setEnabled(false);
                 browseButton.setEnabled(false);
                 directoryTextField.setEnabled(false);
@@ -276,6 +275,7 @@ public class Menu extends JFrame{
                 TrieButton.setEnabled(false);
                 CustomHashMapButton.setEnabled(false);
                 JavaHashMapButton.setEnabled(false);
+                balancedTreeCheckOption.setEnabled(false);
                 commandTextField.setEnabled(true);
 
             }
@@ -676,8 +676,8 @@ public class Menu extends JFrame{
             if (!wordsStructure.search(rEntry.word)) {
                 throw new ResultEntry.ResultException("The word should be in the structure");
             }
-
-        System.out.println("Mean Search Time : " + ((System.nanoTime() - startTime) / result.size()) + " ---> For " + result.size() + " Words\n");
+        if(result.size() != 0)
+            System.out.println("Mean Search Time : " + ((System.nanoTime() - startTime) / result.size()) + " ---> For " + result.size() + " Words\n");
 
     }
 
