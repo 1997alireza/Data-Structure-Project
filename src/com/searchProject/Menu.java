@@ -311,13 +311,19 @@ public class Menu extends JFrame{
         });
         getContentPane().add(resetButton);
 
+        final String HELP_MESSAGE = "  add <FileName> : add a file\n\n  del <FileName> : delete a file\n\n  update <FileName> : update a file\n\n" +
+                "  list -w : show words listed in trees\n" +
+                "         - l  : show files listed in trees\n" +
+                "         - f  : show files in directory\n\n" +
+                "  search -w \"<Word>\" : show files that contains the word\n" +
+                "                - s \"<Sentence>\" : show file that contains the words in the sentence";
         final JButton helpButton = new JButton("Help");
         helpButton.setSize(100, 25);
         helpButton.setLocation(350, 545);
         helpButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(null,"...", "Help", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null,HELP_MESSAGE, "Command Help", JOptionPane.INFORMATION_MESSAGE);
             }
         });
         getContentPane().add(helpButton);
