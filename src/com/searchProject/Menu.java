@@ -316,7 +316,8 @@ public class Menu extends JFrame{
                 "         - l  : show files listed in trees\n" +
                 "         - f  : show files in directory\n\n" +
                 "  search -w \"<Word>\" : show files that contains the word\n" +
-                "                - s \"<Sentence>\" : show file that contains the words in the sentence";
+                "                - s \"<Sentence>\" : show file that contains the words in the sentence\n\n" +
+                "  exit : exit";
         final JButton helpButton = new JButton("Help");
         helpButton.setSize(100, 25);
         helpButton.setLocation(350, 545);
