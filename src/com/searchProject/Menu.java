@@ -9,6 +9,8 @@ import com.searchProject.dataStructures.trees.Tree;
 import com.searchProject.dataStructures.trees.Trie;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -29,10 +31,10 @@ public class Menu extends JFrame{
     private static Stack<String> backwardCommands, forwardCommands;
     private static JTextArea resultField;
     public enum DATA_STRUCTURE_TYPE {
-        BST, TST, Trie, CustomHashMap, JavaHashMap
+        BST, BalancedBST, TST, BalancedTST, Trie, CustomHashMap, JavaHashMap
     }
     public Menu(){
-        setSize(640,600);
+        setSize(640,615);
         setLocationRelativeTo(null);
         setResizable(false);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -42,8 +44,8 @@ public class Menu extends JFrame{
         final JRadioButton TSTButton = new JRadioButton("TST");
         final JRadioButton BSTButton = new JRadioButton("BST");
         final JRadioButton TrieButton = new JRadioButton("Trie");
-        final JRadioButton customHashMapButton = new JRadioButton("HashMap");
-        final JRadioButton javaHashMapButton = new JRadioButton("Java HashMap");
+        final JRadioButton CustomHashMapButton = new JRadioButton("HashMap");
+        final JRadioButton JavaHashMapButton = new JRadioButton("Java HashMap");
 
 
         TSTButton.setLocation(30,430);
@@ -55,24 +57,67 @@ public class Menu extends JFrame{
         TrieButton.setLocation(210,430);
         TrieButton.setSize(80,25);
 
-        customHashMapButton.setLocation(380,430);
-        customHashMapButton.setSize(80, 25);
+        CustomHashMapButton.setLocation(380,430);
+        CustomHashMapButton.setSize(80, 25);
 
-        javaHashMapButton.setLocation(490, 430);
-        javaHashMapButton.setSize(120, 25);
+        JavaHashMapButton.setLocation(490, 430);
+        JavaHashMapButton.setSize(120, 25);
 
         final ButtonGroup dataStructureSelector = new ButtonGroup();
         dataStructureSelector.add(TSTButton);
         dataStructureSelector.add(BSTButton);
         dataStructureSelector.add(TrieButton);
-        dataStructureSelector.add(customHashMapButton);
-        dataStructureSelector.add(javaHashMapButton);
+        dataStructureSelector.add(CustomHashMapButton);
+        dataStructureSelector.add(JavaHashMapButton);
 
         getContentPane().add(TSTButton);
         getContentPane().add(BSTButton);
         getContentPane().add(TrieButton);
-        getContentPane().add(customHashMapButton);
-        getContentPane().add(javaHashMapButton);
+        getContentPane().add(CustomHashMapButton);
+        getContentPane().add(JavaHashMapButton);
+
+        JCheckBox balancedTreeCheckOption = new JCheckBox("Balanced Tree");
+        balancedTreeCheckOption.setSize(120, 25);
+        balancedTreeCheckOption.setLocation(30, 460);
+        balancedTreeCheckOption.setEnabled(false);
+        getContentPane().add(balancedTreeCheckOption);
+
+        TSTButton.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                if(TSTButton.isSelected())
+                    balancedTreeCheckOption.setEnabled(true);
+            }
+        });
+        BSTButton.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                if(BSTButton.isSelected())
+                    balancedTreeCheckOption.setEnabled(true);
+            }
+        });
+        TrieButton.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                if(TrieButton.isSelected())
+                    balancedTreeCheckOption.setEnabled(false);
+            }
+        });
+        CustomHashMapButton.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                if(CustomHashMapButton.isSelected())
+                    balancedTreeCheckOption.setEnabled(false);
+            }
+        });
+        JavaHashMapButton.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                if(JavaHashMapButton.isSelected())
+                    balancedTreeCheckOption.setEnabled(false);
+            }
+        });
+
 
         final JLabel text1 = new JLabel("Please enter address.");
         text1.setFont(new Font("Monospaced", text1.getFont().getStyle(), 17));
@@ -118,14 +163,14 @@ public class Menu extends JFrame{
 
         final JLabel text2 = new JLabel("Please enter your command :");
         text2.setFont(new Font("Monospaced", text2.getFont().getStyle(), 14));
-        text2.setLocation(10,465);
+        text2.setLocation(10,495);
         text2.setSize(300,15);
         getContentPane().add(text2);
 
         final JTextField commandTextField = new JTextField();
         commandTextField.setFont(new Font("Monospaced", text1.getFont().getStyle(), 13));
         commandTextField.setSize(611,25);
-        commandTextField.setLocation(10, 485);
+        commandTextField.setLocation(10, 515);
         commandTextField.setEnabled(false);
         commandTextField.addKeyListener(new KeyAdapter() {
             @Override
@@ -162,7 +207,7 @@ public class Menu extends JFrame{
 
         final JButton buildButton = new JButton("Build");
         buildButton.setSize(100, 25);
-        buildButton.setLocation(10, 515);
+        buildButton.setLocation(10, 545);
         buildButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -188,18 +233,24 @@ public class Menu extends JFrame{
                 Menu.directoryAddress = directory.getPath();
 
                 if(BSTButton.isSelected()) {
-                    dataStructureType = DATA_STRUCTURE_TYPE.BST;
+                    if(balancedTreeCheckOption.isSelected())
+                        dataStructureType = DATA_STRUCTURE_TYPE.BalancedBST;
+                    else
+                        dataStructureType = DATA_STRUCTURE_TYPE.BST;
                 }
                 else if(TSTButton.isSelected()) {
-                    dataStructureType = DATA_STRUCTURE_TYPE.TST;
+                    if(balancedTreeCheckOption.isSelected())
+                        dataStructureType = DATA_STRUCTURE_TYPE.BalancedTST;
+                    else
+                        dataStructureType = DATA_STRUCTURE_TYPE.TST;
                 }
                 else if(TrieButton.isSelected()) {
                     dataStructureType = DATA_STRUCTURE_TYPE.Trie;
                 }
-                else if(customHashMapButton.isSelected()) {
+                else if(CustomHashMapButton.isSelected()) {
                     dataStructureType = DATA_STRUCTURE_TYPE.CustomHashMap;
                 }
-                else if(javaHashMapButton.isSelected()) {
+                else if(JavaHashMapButton.isSelected()) {
                     dataStructureType = DATA_STRUCTURE_TYPE.JavaHashMap;
                 }
 
@@ -216,14 +267,15 @@ public class Menu extends JFrame{
 
                 showWordsList();
 
+                balancedTreeCheckOption.setEnabled(false);
                 buildButton.setEnabled(false);
                 browseButton.setEnabled(false);
                 directoryTextField.setEnabled(false);
                 BSTButton.setEnabled(false);
                 TSTButton.setEnabled(false);
                 TrieButton.setEnabled(false);
-                customHashMapButton.setEnabled(false);
-                javaHashMapButton.setEnabled(false);
+                CustomHashMapButton.setEnabled(false);
+                JavaHashMapButton.setEnabled(false);
                 commandTextField.setEnabled(true);
 
             }
@@ -232,7 +284,7 @@ public class Menu extends JFrame{
 
         final JButton resetButton = new JButton("Reset");
         resetButton.setSize(100, 25);
-        resetButton.setLocation(180, 515);
+        resetButton.setLocation(180, 545);
         resetButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -246,8 +298,10 @@ public class Menu extends JFrame{
                 BSTButton.setEnabled(true);
                 TSTButton.setEnabled(true);
                 TrieButton.setEnabled(true);
-                customHashMapButton.setEnabled(true);
-                javaHashMapButton.setEnabled(true);
+                CustomHashMapButton.setEnabled(true);
+                JavaHashMapButton.setEnabled(true);
+                if(BSTButton.isSelected() || TSTButton.isSelected())
+                    balancedTreeCheckOption.setEnabled(true);
                 resultField.setText("");
                 commandTextField.setText("");
                 commandTextField.setEnabled(false);
@@ -259,7 +313,7 @@ public class Menu extends JFrame{
 
         final JButton helpButton = new JButton("Help");
         helpButton.setSize(100, 25);
-        helpButton.setLocation(350, 515);
+        helpButton.setLocation(350, 545);
         helpButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -270,7 +324,7 @@ public class Menu extends JFrame{
 
         final JButton exitButton = new JButton("Exit");
         exitButton.setSize(100, 25);
-        exitButton.setLocation(520, 515);
+        exitButton.setLocation(520, 545);
         exitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -288,9 +342,11 @@ public class Menu extends JFrame{
         setVisible(true);
         buildButton.setEnabled(false);
         final String stopWordsAddress = "src/res/StopWords.txt";
-        stopWordsStructures = new DataStructure[5];
+        stopWordsStructures = new DataStructure[7];
         stopWordsStructures[DATA_STRUCTURE_TYPE.BST.ordinal()] = build(new File(stopWordsAddress), DATA_STRUCTURE_TYPE.BST, true);
+        stopWordsStructures[DATA_STRUCTURE_TYPE.BalancedBST.ordinal()] = build(new File(stopWordsAddress), DATA_STRUCTURE_TYPE.BalancedBST, true);
         stopWordsStructures[DATA_STRUCTURE_TYPE.TST.ordinal()] = build(new File(stopWordsAddress), DATA_STRUCTURE_TYPE.TST, true);
+        stopWordsStructures[DATA_STRUCTURE_TYPE.BalancedTST.ordinal()] = build(new File(stopWordsAddress), DATA_STRUCTURE_TYPE.BalancedTST, true);
         stopWordsStructures[DATA_STRUCTURE_TYPE.Trie.ordinal()] = build(new File(stopWordsAddress), DATA_STRUCTURE_TYPE.Trie, true);
         stopWordsStructures[DATA_STRUCTURE_TYPE.CustomHashMap.ordinal()] = build(new File(stopWordsAddress), DATA_STRUCTURE_TYPE.CustomHashMap, true);
         stopWordsStructures[DATA_STRUCTURE_TYPE.JavaHashMap.ordinal()] = build(new File(stopWordsAddress), DATA_STRUCTURE_TYPE.JavaHashMap, true);
@@ -302,10 +358,16 @@ public class Menu extends JFrame{
         DataStructure dataStructure = null;
         switch (type){
             case BST:
-                dataStructure = new BST();
+                dataStructure = new BST(false);
+                break;
+            case BalancedBST:
+                dataStructure = new BST(true);
                 break;
             case TST:
-                dataStructure = new TST();
+                dataStructure = new TST(false);
+                break;
+            case BalancedTST:
+                dataStructure = new TST(true);
                 break;
             case Trie:
                 dataStructure = new Trie();

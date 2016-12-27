@@ -7,6 +7,7 @@ import com.searchProject.dataStructures.LinkedList;
 import java.util.ArrayList;
 
 public class BST extends Tree {
+    private boolean balancedTree;
     private static class NodePointer{
         public Node node;
     }
@@ -34,8 +35,9 @@ public class BST extends Tree {
         }
     }
     private Node root;
-    public BST(){
+    public BST(boolean balancedTree){
         root = null;
+        this.balancedTree = balancedTree;
     }
 
     public boolean isEmpty() {
@@ -48,7 +50,8 @@ public class BST extends Tree {
         NodePointer finalNodePtr = new NodePointer();
         root = insert(root, word, finalNodePtr);
 
-        balance(); // for balanced tree
+        if(balancedTree)
+            balance(); // for balanced tree
         return finalNodePtr.node;
     }
 
@@ -133,7 +136,8 @@ public class BST extends Tree {
 
         root = extraNode.right;
 
-        balance(); // for balanced tree
+        if(balancedTree)
+            balance(); // for balanced tree
     }
 
     public boolean search(String word){
