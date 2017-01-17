@@ -1,0 +1,2 @@
+# Data-Structure-Project
+It's a simple search engine. I've implemented [`BST`](https://en.wikipedia.org/wiki/Binary_search_tree), [`AVL (Balanced BST)`](https://en.wikipedia.org/wiki/AVL_tree), [`TST`](https://en.wikipedia.org/wiki/Ternary_search_tree), `Balanced TST`, [`Trie`](https://en.wikipedia.org/wiki/Trie) and [`HashMap`](https://en.wikipedia.org/wiki/Hash_table) using [`chaining approach`](https://en.wikipedia.org/wiki/Hash_table#Separate_chaining_with_linked_lists) based on `LinkedList`.
